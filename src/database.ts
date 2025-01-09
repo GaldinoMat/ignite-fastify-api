@@ -1,8 +1,20 @@
-import { knex as setupKnex } from 'knex'
+import { Knex, knex as setupKnex } from 'knex'
+import { env } from './env'
 
-export const knex = setupKnex({
+if (!process.env.DATABASE_URL) {
+  throw new Error('Database env not found')
+}
+
+export const config: Knex.Config = {
   client: 'sqlite',
   connection: {
-    filename: './tmp/app.db',
+    filename: env.DATABASE_URL,
   },
-})
+  useNullAsDefault: true,
+  migrations: {
+    extension: 'ts',
+    directory: './db',
+  },
+}
+
+export const knex = setupKnex(config)
